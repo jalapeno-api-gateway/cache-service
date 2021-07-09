@@ -12,7 +12,7 @@ Make sure you have setup the [global development environment](https://gitlab.ost
 ### Step 1: Initialize Okteto
 - Clone the repository:
 ```bash
-$ git clone ssh://git@gitlab.ost.ch:45022/ins/jalapeno-api/sr-app.git
+$ git clone ssh://git@gitlab.ost.ch:45022/ins/jalapeno-api/graph-db-feeder.git
 ```
 - Initialize okteto:
 ```bash
@@ -58,6 +58,7 @@ environment:
 - In the VSCode instance from the container, install the `Go` extension, otherwise the command `go` will not work on the VSCode command line.
 - Install any additional extensions you want.
 
+### Optional
 #### Install the Protocol Buffer Compiler
 Here is the official guide: https://grpc.io/docs/protoc-installation/  
 Just run these commands:
