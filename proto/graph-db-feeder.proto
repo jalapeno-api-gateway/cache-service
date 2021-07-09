@@ -4,13 +4,14 @@ package graphdbfeeder;
 option go_package = "gitlab.ost.ch/ins/jalapeno-api/graph-db-feeder/proto/graph-db-feeder;graphdbfeeder";
 
 message NodeIds {
-    repeated int32 ids = 1;
+    repeated string ids = 1;
 }
 
 message Node {
-    int32 id = 1;
+    string key = 1;
     string name = 2;
     int32 asn = 3;
+    string router_ip = 4;
 }
 
 service GraphDbFeeder {

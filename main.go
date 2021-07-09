@@ -2,12 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net"
 	"os"
-	"regexp"
-	"strconv"
 
 	driver "github.com/arangodb/go-driver"
 	"github.com/arangodb/go-driver/http"
@@ -19,10 +16,11 @@ type graphDbFeederService struct {
 	graphproto.UnimplementedGraphDbFeederServer
 }
 
-type nodeDocument struct {
-	RouterID string
-	Name string;
-	ASN int32;
+type NodeDocument struct {
+	Key string `json:"_key,omitempty"`;
+	Name string `json:"name,omitempty"`;
+	Asn int32 `json:"asn,omitempty"`;
+	Router_ip string `json:"router_ip,omitempty"`;
 }
 
 func newServer() *graphDbFeederService {
@@ -75,7 +73,7 @@ func connectToArangoDb() driver.Client {
 	return c
 }
 
-func getNodesFromArangoDb(arangoDbClient driver.Client, ids []int32) []graphproto.Node {
+func getNodesFromArangoDb(arangoDbClient driver.Client, keys []string) []graphproto.Node {
 	var nodes []graphproto.Node
 	
 	// Opening the database
@@ -91,37 +89,25 @@ func getNodesFromArangoDb(arangoDbClient driver.Client, ids []int32) []graphprot
 		log.Fatalf("Could not open LSNode collection, %v", err)
 	}
 
-	for _, id := range ids {
-		_id := getDbId(id)
-		
+	log.Println("1")
+	for _, key := range keys {		
 		// Reading document from collection
-		var doc nodeDocument
-		_, err := col.ReadDocument(ctx, _id, &doc)
+		var doc NodeDocument
+		_, err := col.ReadDocument(ctx, key, &doc)
 		if err != nil {
-			log.Fatalf("Could not read document with _id: %s, %v", _id, err)
+			log.Println("2")
+			log.Fatalf("Could not read document with _id: %s, %v", key, err)
 		}
 
-		node := graphproto.Node{Id: getIdFromRouterId(doc.RouterID), Name: doc.Name, Asn: doc.ASN}
+		log.Println("3")
+		node := graphproto.Node{Key: doc.Key, Name: doc.Name, Asn: doc.Asn, RouterIp: doc.Router_ip}
+		log.Println("4")
 		nodes = append(nodes, node)
 	}
 
 	return nodes
 }
 
-func getDbId(id int32) string {
-	// Convert int id = 1 to string _id = 1.1.1.1
-	return fmt.Sprintf("%d.%d.%d.%d", id, id, id, id)
-}
-
-func getIdFromRouterId(_id string) int32 {
-	// Convert string _id = 1.1.1.1 to int id = 1
-	re := regexp.MustCompile("[0-9]+")
-	id, err := strconv.Atoi(re.FindAllString(_id, -1)[0])
-	if err != nil {
-		log.Fatalf("Could not extract id from string, %v", err)
-	}
-	return int32(id)
-}
 
 // func cacheNode(ctx context.Context, nodeId int, node *rs.NodeResponse) {
 // 	key := strconv.Itoa(nodeId)
