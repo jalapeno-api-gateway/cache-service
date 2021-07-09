@@ -1,0 +1,25 @@
+name: graph-db-feeder
+autocreate: true
+image: okteto/golang:1
+command: bash
+namespace: jagw-dev-michel
+securityContext:
+  capabilities:
+    add:
+      - SYS_PTRACE
+volumes:
+  - /go/pkg/
+  - /root/.cache/go-build/
+  - /root/.vscode-server
+  - /go/bin/
+  - /bin/protoc/
+sync:
+  - .:/usr/src/app
+forward:
+  - 2348:2345
+  - 8083:8080
+environment:
+  - ARANGO_DB=http://bongard.internet-box.ch:8529
+  - ARANGO_DB_USER=root
+  - ARANGO_DB_PASSWORD=jalapeno
+  - ARANGO_DB_NAME=jalapeno
