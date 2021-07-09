@@ -6,7 +6,8 @@
 $ /bin/protoc/bin/protoc --proto_path=./proto --go_out=./proto --go_opt=paths=source_relative --go-grpc_out=./proto --go-grpc_opt=paths=source_relative ./proto/graph-db-feeder.proto
 ```
 
-## Settin Up Development Environment
+## Setting Up Development Environment
+Make sure you have setup the [global development environment](https://gitlab.ost.ch/ins/jalapeno-api/request-service/-/wikis/Development-Environment) first.
 
 ### Step 1: Initialize Okteto
 - Clone the repository:
