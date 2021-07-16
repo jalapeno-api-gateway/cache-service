@@ -84,7 +84,6 @@ func getNodesFromArangoDb(arangoDbClient driver.Client, keys []string) []graphpr
 		log.Fatalf("Could not open LSNode collection, %v", err)
 	}
 
-	log.Println("1")
 	for _, key := range keys {
 		var doc NodeDocument
 		_, err := col.ReadDocument(ctx, key, &doc)
