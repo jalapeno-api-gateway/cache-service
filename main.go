@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"runtime"
 
 	driver "github.com/arangodb/go-driver"
 	"github.com/arangodb/go-driver/http"
@@ -43,31 +44,48 @@ func main() {
 }
 
 func (s *graphDbFeederService) GetNodes(nodeIds *graphproto.NodeIds, responseStream graphproto.GraphDbFeeder_GetNodesServer) error {
-	arangoDbClient := connectToArangoDb()
-	nodes := getNodesFromArangoDb(arangoDbClient, nodeIds.Ids)
-	for _, node := range nodes {
-		if err := responseStream.Send(&node); err != nil {
-			log.Fatalf("Could not return node to request-service, %v", err)
+	//Sequentiell
+	//arangoDbClient := connectToArangoDb()
+	// nodes := getNodesFromArangoDb(arangoDbClient, nodeIds.Ids) //sequentiell sollte concurrent sein.
+	// for _, node := range nodes {
+	// 	if err := responseStream.Send(&node); err != nil {
+	// 		log.Fatalf("Could not return node to request-service, %v", err)
+	// 	}
+	// }
+	// return nil
+
+	//Concurrent try 1 with worker pool
+	log.Print("GetNodes called from RequestService")
+	log.Print("Start fetching Nodes")
+	var workerId = 1
+	jobs := make(chan []string, len(nodeIds.Ids))             //jobs contains ids which need to be fetched from DB; Buffer Size = amount of ids to fetch
+	results := make(chan []graphproto.Node, len(nodeIds.Ids)) //results contains fetched node objects
+	for i := 0; i < runtime.NumCPU(); i++ {                   //create as many workers as cores exist
+		go worker(jobs, results, workerId) //start worker to fetch nodes from DB
+		workerId++
+	}
+	for _, id := range nodeIds.Ids {
+		jobs <- []string{id} //fill jobs queue: only one id per array can/should be adjusted
+	}
+	close(jobs)                             //all jobs created so channel can be closed
+	for j := 0; j < len(nodeIds.Ids); j++ { //for each job one result is expected
+		nodes := <-results
+		for _, node := range nodes {
+			if err := responseStream.Send(&node); err != nil {
+				log.Fatalf("Could not return node to request-service, %v", err)
+			}
 		}
 	}
+	log.Print("Finished Fetching Nodes")
 	return nil
 }
 
-func connectToArangoDb() driver.Client {
-	conn, err := http.NewConnection(http.ConnectionConfig{
-		Endpoints: []string{os.Getenv("ARANGO_DB")},
-	})
-	if err != nil {
-		log.Fatalf("Could not connect to ArangoDb, %v", err)
+func worker(jobs <-chan []string, results chan<- []graphproto.Node, workerId int) {
+	arangoDbClient := connectToArangoDb()
+	log.Printf("Worker %d fetching from DB", workerId)
+	for job := range jobs {
+		results <- getNodesFromArangoDb(arangoDbClient, job)
 	}
-	c, err := driver.NewClient(driver.ClientConfig{
-		Connection:     conn,
-		Authentication: driver.BasicAuthentication(os.Getenv("ARANGO_DB_USER"), os.Getenv("ARANGO_DB_PASSWORD")),
-	})
-	if err != nil {
-		log.Fatalf("Could not create new ArangoDb client, %v", err)
-	}
-	return c
 }
 
 func getNodesFromArangoDb(arangoDbClient driver.Client, keys []string) []graphproto.Node {
@@ -94,6 +112,23 @@ func getNodesFromArangoDb(arangoDbClient driver.Client, keys []string) []graphpr
 		nodes = append(nodes, node)
 	}
 	return nodes
+}
+
+func connectToArangoDb() driver.Client {
+	conn, err := http.NewConnection(http.ConnectionConfig{
+		Endpoints: []string{os.Getenv("ARANGO_DB")},
+	})
+	if err != nil {
+		log.Fatalf("Could not connect to ArangoDb, %v", err)
+	}
+	c, err := driver.NewClient(driver.ClientConfig{
+		Connection:     conn,
+		Authentication: driver.BasicAuthentication(os.Getenv("ARANGO_DB_USER"), os.Getenv("ARANGO_DB_PASSWORD")),
+	})
+	if err != nil {
+		log.Fatalf("Could not create new ArangoDb client, %v", err)
+	}
+	return c
 }
 
 // func cacheNode(ctx context.Context, nodeId int, node *rs.NodeResponse) {
