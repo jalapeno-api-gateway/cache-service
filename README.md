@@ -41,7 +41,7 @@ forward:
   - 2348:2345
   - 8083:8080
 environment:
-  - ARANGO_DB=http://10.20.1.24:8529
+  - ARANGO_DB=http://10.20.1.24:30852
   - ARANGO_DB_USER=root
   - ARANGO_DB_PASSWORD=jalapeno
   - ARANGO_DB_NAME=jalapeno
