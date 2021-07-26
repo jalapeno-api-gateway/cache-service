@@ -9,6 +9,7 @@ import (
 
 	driver "github.com/arangodb/go-driver"
 	"github.com/arangodb/go-driver/http"
+	redis "github.com/go-redis/redis/v8"
 	graphproto "gitlab.ost.ch/ins/jalapeno-api/graph-db-feeder/proto"
 	grpc "google.golang.org/grpc"
 )
@@ -41,20 +42,45 @@ func main() {
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve gRPC server over port 9001: %v", err)
 	}
+
+	//Load all data form ArangoDb into the cache
+	loadArangoDbIntoCache()
+}
+
+func loadArangoDbIntoCache() {
+	log.Print("Loading initial Data from ArangoDb into Cache")
+	log.Print("Loading LSNode Collection from ArangoDb into Cache")
+	loadLSNodeCollection()
+}
+
+func loadLSNodeCollection() {
+	log.Print("Loading all Nodes into Cache")
+	ctx := context.Background()
+	arangoDbClient := connectToArangoDb()
+	db, err := arangoDbClient.Database(ctx, os.Getenv("ARANGO_DB_NAME"))
+	if err != nil {
+		log.Fatalf("Could not open database, %v", err)
+	}
+	cursor, err := db.Query(ctx, "FOR d IN LSNode RETURN d", nil)
+	if err != nil {
+		//handle error
+		log.Fatalf("Could not create Cursor , %v", err)
+	}
+	defer cursor.Close()
+	for {
+		var node NodeDocument
+		meta, err := cursor.ReadDocument(ctx, &node)
+		if driver.IsNoMoreDocuments(err) {
+			break
+		} else if err != nil {
+			log.Fatalf("Could not fetch Node from LSNode Collection , %v", err)
+		}
+		writeNodeToRedis(meta.Key, node)
+	}
 }
 
 func (s *graphDbFeederService) GetNodes(nodeIds *graphproto.NodeIds, responseStream graphproto.GraphDbFeeder_GetNodesServer) error {
-	//Sequentiell
-	//arangoDbClient := connectToArangoDb()
-	// nodes := getNodesFromArangoDb(arangoDbClient, nodeIds.Ids) //sequentiell sollte concurrent sein.
-	// for _, node := range nodes {
-	// 	if err := responseStream.Send(&node); err != nil {
-	// 		log.Fatalf("Could not return node to request-service, %v", err)
-	// 	}
-	// }
-	// return nil
-
-	//Concurrent try 1 with worker pool
+	//Concurrent with worker pool
 	log.Print("GetNodes called from RequestService")
 	log.Print("Start fetching Nodes")
 	var workerId = 1
@@ -103,6 +129,8 @@ func getNodesFromArangoDb(arangoDbClient driver.Client, keys []string) []graphpr
 	}
 
 	for _, key := range keys {
+		// TODO: check if node is in cache
+
 		var doc NodeDocument
 		_, err := col.ReadDocument(ctx, key, &doc)
 		if err != nil {
@@ -112,6 +140,37 @@ func getNodesFromArangoDb(arangoDbClient driver.Client, keys []string) []graphpr
 		nodes = append(nodes, node)
 	}
 	return nodes
+}
+
+func ReadMessageFromRedis(ctx context.Context, key string) *graphproto.Node {
+	// rdb := redis.NewFailoverClient(&redis.FailoverOptions{
+	// 	MasterName:    os.Getenv("SENTINEL_MASTER"),
+	// 	SentinelAddrs: []string{os.Getenv("SENTINEL_ADDRESS")},
+	// 	Password:      os.Getenv("REDIS_PASSWORD"),
+	// 	DB:            0,
+	// })
+	// bytes, err := rdb.Get(ctx, key).Result()
+	// if err == redis.Nil {
+	// 	return nil //key does not exist
+	// } else if err != nil {
+	// 	panic(err) //error accessing key
+	// } else {
+	// 	return &graphproto.Node{}
+	// }
+	return nil
+}
+
+func writeNodeToRedis(key string, node NodeDocument) {
+	rdb := redis.NewFailoverClient(&redis.FailoverOptions{
+		MasterName:    os.Getenv("SENTINEL_MASTER"),
+		SentinelAddrs: []string{os.Getenv("SENTINEL_ADDRESS")},
+		Password:      os.Getenv("REDIS_PASSWORD"),
+		DB:            0,
+	})
+	err := rdb.Set(context.Background(), key, node, 0)
+	if err != nil {
+		log.Fatalf("Could not write Node to Redis Cache, %v", err)
+	}
 }
 
 func connectToArangoDb() driver.Client {
@@ -130,11 +189,6 @@ func connectToArangoDb() driver.Client {
 	}
 	return c
 }
-
-// func cacheNode(ctx context.Context, nodeId int, node *rs.NodeResponse) {
-// 	key := strconv.Itoa(nodeId)
-// 	redis.StoreMessage(ctx, key, node)
-// }
 
 // func getNodeFromCache(ctx context.Context, nodeId int) *rs.NodeResponse {
 // 	key := strconv.Itoa(nodeId)
