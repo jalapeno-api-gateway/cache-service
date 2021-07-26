@@ -48,7 +48,6 @@ type LinkDocument struct {
 	RemoteLink_ip string `json:"remote_link_ip,omitempty"`
 }
 
-//Marshaling Method used to write LinkDocument to Redis
 func (link LinkDocument) MarshalBinary() ([]byte, error) {
 	return json.Marshal(link)
 }
@@ -56,6 +55,34 @@ func (link LinkDocument) MarshalBinary() ([]byte, error) {
 func newServer() *graphDbFeederService {
 	s := &graphDbFeederService{}
 	return s
+}
+
+//Implementd GRPC Methods
+func (s *graphDbFeederService) GetNodes(nodeIds *graphproto.NodeIds, responseStream graphproto.GraphDbFeeder_GetNodesServer) error {
+	//Concurrent with worker pool
+	log.Print("GetNodes called from RequestService")
+	log.Print("Start fetching Nodes")
+	var workerId = 1
+	jobs := make(chan []string, len(nodeIds.Ids))             //jobs contains ids which need to be fetched from DB; Buffer Size = amount of ids to fetch
+	results := make(chan []graphproto.Node, len(nodeIds.Ids)) //results contains fetched node objects
+	for i := 0; i < runtime.NumCPU(); i++ {                   //create as many workers as cores exist
+		go worker(jobs, results, workerId) //start worker to fetch nodes from DB
+		workerId++
+	}
+	for _, id := range nodeIds.Ids {
+		jobs <- []string{id} //fill jobs queue: only one id per array can/should be adjusted
+	}
+	close(jobs)                             //all jobs created so channel can be closed
+	for j := 0; j < len(nodeIds.Ids); j++ { //for each job one result is expected
+		nodes := <-results
+		for _, node := range nodes {
+			if err := responseStream.Send(&node); err != nil {
+				log.Fatalf("Could not return node to request-service, %v", err)
+			}
+		}
+	}
+	log.Print("Finished Fetching Nodes")
+	return nil
 }
 
 func main() {
@@ -80,7 +107,6 @@ func loadArangoDbIntoCache() {
 	log.Print("Loading LSLink Collection from ArangoDb into Cache")
 	loadLSLinkCollection()
 	log.Print("Loading LSLink Collection from ArangoDb into Cache DONE")
-
 }
 
 func loadLSNodeCollection() {
@@ -131,33 +157,6 @@ func loadLSLinkCollection() {
 	}
 }
 
-func (s *graphDbFeederService) GetNodes(nodeIds *graphproto.NodeIds, responseStream graphproto.GraphDbFeeder_GetNodesServer) error {
-	//Concurrent with worker pool
-	log.Print("GetNodes called from RequestService")
-	log.Print("Start fetching Nodes")
-	var workerId = 1
-	jobs := make(chan []string, len(nodeIds.Ids))             //jobs contains ids which need to be fetched from DB; Buffer Size = amount of ids to fetch
-	results := make(chan []graphproto.Node, len(nodeIds.Ids)) //results contains fetched node objects
-	for i := 0; i < runtime.NumCPU(); i++ {                   //create as many workers as cores exist
-		go worker(jobs, results, workerId) //start worker to fetch nodes from DB
-		workerId++
-	}
-	for _, id := range nodeIds.Ids {
-		jobs <- []string{id} //fill jobs queue: only one id per array can/should be adjusted
-	}
-	close(jobs)                             //all jobs created so channel can be closed
-	for j := 0; j < len(nodeIds.Ids); j++ { //for each job one result is expected
-		nodes := <-results
-		for _, node := range nodes {
-			if err := responseStream.Send(&node); err != nil {
-				log.Fatalf("Could not return node to request-service, %v", err)
-			}
-		}
-	}
-	log.Print("Finished Fetching Nodes")
-	return nil
-}
-
 func worker(jobs <-chan []string, results chan<- []graphproto.Node, workerId int) {
 	arangoDbClient := connectToArangoDb()
 	log.Printf("Worker %d fetching from DB", workerId)
@@ -182,34 +181,38 @@ func getNodesFromArangoDb(arangoDbClient driver.Client, keys []string) []graphpr
 
 	for _, key := range keys {
 		// TODO: check if node is in cache
-
-		var doc NodeDocument
-		_, err := col.ReadDocument(ctx, key, &doc)
-		if err != nil {
-			log.Fatalf("Could not read document with _id: %s, %v", key, err)
+		node := readNodeFromRedis(context.Background(), key)
+		if node != nil { //node is in cache
+			log.Printf("Node with key <%s> CACHE HIT", key)
+			nodes = append(nodes, graphproto.Node{Key: node.Key, Name: node.Name, Asn: node.Asn, RouterIp: node.Router_ip})
+		} else { // node not in cache
+			log.Printf("Node with key <%s> CACHE MISS", key)
+			var doc NodeDocument
+			_, err := col.ReadDocument(ctx, key, &doc)
+			if err != nil {
+				log.Fatalf("Could not read document with _id: %s, %v", key, err)
+			}
+			node := graphproto.Node{Key: doc.Key, Name: doc.Name, Asn: doc.Asn, RouterIp: doc.Router_ip}
+			nodes = append(nodes, node)
 		}
-		node := graphproto.Node{Key: doc.Key, Name: doc.Name, Asn: doc.Asn, RouterIp: doc.Router_ip}
-		nodes = append(nodes, node)
 	}
 	return nodes
 }
 
-func readMessageFromRedis(ctx context.Context, key string) *graphproto.Node {
-	// rdb := redis.NewFailoverClient(&redis.FailoverOptions{
-	// 	MasterName:    os.Getenv("SENTINEL_MASTER"),
-	// 	SentinelAddrs: []string{os.Getenv("SENTINEL_ADDRESS")},
-	// 	Password:      os.Getenv("REDIS_PASSWORD"),
-	// 	DB:            0,
-	// })
-	// bytes, err := rdb.Get(ctx, key).Result()
-	// if err == redis.Nil {
-	// 	return nil //key does not exist
-	// } else if err != nil {
-	// 	panic(err) //error accessing key
-	// } else {
-	// 	return &graphproto.Node{}
-	// }
-	return nil
+func readNodeFromRedis(ctx context.Context, key string) *NodeDocument {
+	node := &NodeDocument{}
+	bytes, err := rdb.Get(ctx, key).Bytes()
+	if err == redis.Nil {
+		return nil //key does not exist
+	} else if err != nil {
+		panic(err) //error accessing key
+	} else {
+		err := json.Unmarshal(bytes, node)
+		if err != nil {
+			log.Fatal("Marshalling error: ", err)
+		}
+		return node
+	}
 }
 
 func writeNodeToRedis(key string, node NodeDocument) {
