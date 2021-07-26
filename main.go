@@ -167,20 +167,17 @@ func worker(jobs <-chan []string, results chan<- []graphproto.Node, workerId int
 
 func getNodesFromArangoDb(arangoDbClient driver.Client, keys []string) []graphproto.Node {
 	var nodes []graphproto.Node
-
 	ctx := context.Background()
 	db, err := arangoDbClient.Database(ctx, os.Getenv("ARANGO_DB_NAME"))
 	if err != nil {
 		log.Fatalf("Could not open database, %v", err)
 	}
-
 	col, err := db.Collection(ctx, "LSNode")
 	if err != nil {
 		log.Fatalf("Could not open LSNode collection, %v", err)
 	}
 
 	for _, key := range keys {
-		// TODO: check if node is in cache
 		node := readNodeFromRedis(context.Background(), key)
 		if node != nil { //node is in cache
 			log.Printf("Node with key <%s> CACHE HIT", key)
