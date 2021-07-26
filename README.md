@@ -45,6 +45,9 @@ environment:
   - ARANGO_DB_USER=root
   - ARANGO_DB_PASSWORD=jalapeno
   - ARANGO_DB_NAME=jalapeno
+  - REDIS_PASSWORD=a-very-complex-password-here
+  - SENTINEL_ADDRESS=sentinel.jagw-dev-dominique.svc.cluster.local:5000
+  - SENTINEL_MASTER=mymaster
 ```
 
 ### Step 2: Initialize the Container

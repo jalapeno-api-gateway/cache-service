@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net"
 	"os"
@@ -14,6 +15,15 @@ import (
 	grpc "google.golang.org/grpc"
 )
 
+// GLOBAL VARS
+var rdb = redis.NewFailoverClient(&redis.FailoverOptions{
+	MasterName:    os.Getenv("SENTINEL_MASTER"),
+	SentinelAddrs: []string{os.Getenv("SENTINEL_ADDRESS")},
+	Password:      os.Getenv("REDIS_PASSWORD"),
+	DB:            0,
+})
+
+//Type Definition
 type graphDbFeederService struct {
 	graphproto.UnimplementedGraphDbFeederServer
 }
@@ -25,14 +35,32 @@ type NodeDocument struct {
 	Router_ip string `json:"router_ip,omitempty"`
 }
 
+//Marshaling Method used to write NodeDocument to Redis
+func (node NodeDocument) MarshalBinary() ([]byte, error) {
+	return json.Marshal(node)
+}
+
+type LinkDocument struct {
+	Key           string `json:"_key,omitempty"`
+	Router_ip     string `json:"router_ip,omitempty"`
+	Peer_ip       string `json:"peer_ip,omitempty"`
+	LocalLink_ip  string `json:"local_link_ip,omitempty"`
+	RemoteLink_ip string `json:"remote_link_ip,omitempty"`
+}
+
+//Marshaling Method used to write LinkDocument to Redis
+func (link LinkDocument) MarshalBinary() ([]byte, error) {
+	return json.Marshal(link)
+}
+
 func newServer() *graphDbFeederService {
 	s := &graphDbFeederService{}
 	return s
 }
 
 func main() {
-	//Start gRPC server for Request Service
 	log.Print("Starting GraphDbFeeder ...")
+	loadArangoDbIntoCache()
 	lis, err := net.Listen("tcp", "0.0.0.0:9001")
 	if err != nil {
 		log.Fatalf("Failed to listen on port 9001: %v", err)
@@ -42,19 +70,20 @@ func main() {
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve gRPC server over port 9001: %v", err)
 	}
-
-	//Load all data form ArangoDb into the cache
-	loadArangoDbIntoCache()
 }
 
 func loadArangoDbIntoCache() {
-	log.Print("Loading initial Data from ArangoDb into Cache")
 	log.Print("Loading LSNode Collection from ArangoDb into Cache")
 	loadLSNodeCollection()
+	log.Print("Loading of LSNode Collection from ArangoDb into Cache DONE")
+
+	log.Print("Loading LSLink Collection from ArangoDb into Cache")
+	loadLSLinkCollection()
+	log.Print("Loading LSLink Collection from ArangoDb into Cache DONE")
+
 }
 
 func loadLSNodeCollection() {
-	log.Print("Loading all Nodes into Cache")
 	ctx := context.Background()
 	arangoDbClient := connectToArangoDb()
 	db, err := arangoDbClient.Database(ctx, os.Getenv("ARANGO_DB_NAME"))
@@ -63,7 +92,6 @@ func loadLSNodeCollection() {
 	}
 	cursor, err := db.Query(ctx, "FOR d IN LSNode RETURN d", nil)
 	if err != nil {
-		//handle error
 		log.Fatalf("Could not create Cursor , %v", err)
 	}
 	defer cursor.Close()
@@ -76,6 +104,30 @@ func loadLSNodeCollection() {
 			log.Fatalf("Could not fetch Node from LSNode Collection , %v", err)
 		}
 		writeNodeToRedis(meta.Key, node)
+	}
+}
+
+func loadLSLinkCollection() {
+	ctx := context.Background()
+	arangoDbClient := connectToArangoDb()
+	db, err := arangoDbClient.Database(ctx, os.Getenv("ARANGO_DB_NAME"))
+	if err != nil {
+		log.Fatalf("Could not open database, %v", err)
+	}
+	cursor, err := db.Query(ctx, "FOR d IN LSLink RETURN d", nil)
+	if err != nil {
+		log.Fatalf("Could not create Cursor , %v", err)
+	}
+	defer cursor.Close()
+	for {
+		var node LinkDocument
+		meta, err := cursor.ReadDocument(ctx, &node)
+		if driver.IsNoMoreDocuments(err) {
+			break
+		} else if err != nil {
+			log.Fatalf("Could not fetch Link from LSLink Collection , %v", err)
+		}
+		writeLinkToRedis(meta.Key, node)
 	}
 }
 
@@ -142,7 +194,7 @@ func getNodesFromArangoDb(arangoDbClient driver.Client, keys []string) []graphpr
 	return nodes
 }
 
-func ReadMessageFromRedis(ctx context.Context, key string) *graphproto.Node {
+func readMessageFromRedis(ctx context.Context, key string) *graphproto.Node {
 	// rdb := redis.NewFailoverClient(&redis.FailoverOptions{
 	// 	MasterName:    os.Getenv("SENTINEL_MASTER"),
 	// 	SentinelAddrs: []string{os.Getenv("SENTINEL_ADDRESS")},
@@ -161,15 +213,16 @@ func ReadMessageFromRedis(ctx context.Context, key string) *graphproto.Node {
 }
 
 func writeNodeToRedis(key string, node NodeDocument) {
-	rdb := redis.NewFailoverClient(&redis.FailoverOptions{
-		MasterName:    os.Getenv("SENTINEL_MASTER"),
-		SentinelAddrs: []string{os.Getenv("SENTINEL_ADDRESS")},
-		Password:      os.Getenv("REDIS_PASSWORD"),
-		DB:            0,
-	})
-	err := rdb.Set(context.Background(), key, node, 0)
+	err := rdb.Set(context.Background(), key, node, 0).Err()
 	if err != nil {
 		log.Fatalf("Could not write Node to Redis Cache, %v", err)
+	}
+}
+
+func writeLinkToRedis(key string, link LinkDocument) {
+	err := rdb.Set(context.Background(), key, link, 0).Err()
+	if err != nil {
+		log.Fatalf("Could not write Link to Redis Cache, %v", err)
 	}
 }
 
@@ -189,19 +242,3 @@ func connectToArangoDb() driver.Client {
 	}
 	return c
 }
-
-// func getNodeFromCache(ctx context.Context, nodeId int) *rs.NodeResponse {
-// 	key := strconv.Itoa(nodeId)
-// 	return redis.ReadMessage(ctx, key)
-// }
-
-// func processGetNodeRequest(id int) rs.NodeResponse {
-// 	return rs.NodeResponse{
-// 		Id:   int32(id),
-// 		Name: getNodeNameById(id),
-// 	}
-// }
-
-// func getNodeNameById(id int) string {
-// 	return "Node-" + strconv.Itoa(id)
-// }
