@@ -88,14 +88,14 @@ func (s *graphDbFeederService) GetNodes(nodeIds *graphproto.NodeIds, responseStr
 func main() {
 	log.Print("Starting GraphDbFeeder ...")
 	loadArangoDbIntoCache()
-	lis, err := net.Listen("tcp", "0.0.0.0:9001")
+	lis, err := net.Listen("tcp", "0.0.0.0:9000")
 	if err != nil {
-		log.Fatalf("Failed to listen on port 9001: %v", err)
+		log.Fatalf("Failed to listen on port 9000: %v", err)
 	}
 	grpcServer := grpc.NewServer()
 	graphproto.RegisterGraphDbFeederServer(grpcServer, newServer())
 	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatalf("Failed to serve gRPC server over port 9001: %v", err)
+		log.Fatalf("Failed to serve gRPC server over port 9000: %v", err)
 	}
 }
 
