@@ -6,8 +6,10 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/signal"
 	"runtime"
 
+	"github.com/Shopify/sarama"
 	driver "github.com/arangodb/go-driver"
 	"github.com/arangodb/go-driver/http"
 	redis "github.com/go-redis/redis/v8"
@@ -88,6 +90,10 @@ func (s *graphDbFeederService) GetNodes(nodeIds *graphproto.NodeIds, responseStr
 func main() {
 	log.Print("Starting GraphDbFeeder ...")
 	loadArangoDbIntoCache()
+
+	// TODO: listen in kafka for updates to the ArangoDb
+	listenForTopologyEvent()
+
 	lis, err := net.Listen("tcp", "0.0.0.0:9000")
 	if err != nil {
 		log.Fatalf("Failed to listen on port 9000: %v", err)
@@ -97,6 +103,52 @@ func main() {
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve gRPC server over port 9000: %v", err)
 	}
+}
+
+func listenForTopologyEvent() {
+
+	//./kafka-console-consumer.sh --bootstrap-server localhost:9092  --topic gobmp.parsed.ls_node
+	//./kafka-console-consumer.sh --bootstrap-server localhost:9092  --topic gobmp.parsed.ls_link
+
+	consumer, err := sarama.NewConsumer([]string{"10.20.1.24:31133"}, sarama.NewConfig())
+	if err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if err := consumer.Close(); err != nil {
+			log.Fatalln(err)
+		}
+	}()
+
+	partitionConsumer, err := consumer.ConsumePartition("gobmp.parsed.ls_link_events", 0, sarama.OffsetNewest)
+	if err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if err := partitionConsumer.Close(); err != nil {
+			log.Fatalln(err)
+		}
+	}()
+
+	// Trap SIGINT to trigger a shutdown.
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt)
+
+	consumed := 0
+ConsumerLoop:
+	for {
+		select {
+		case msg := <-partitionConsumer.Messages():
+			log.Printf("Consumed message offset %d\n", msg.Offset)
+			log.Print(string(msg.Value))
+			consumed++
+		case <-signals:
+			break ConsumerLoop
+		}
+	}
+	log.Printf("Consumed: %d\n", consumed)
 }
 
 func loadArangoDbIntoCache() {
