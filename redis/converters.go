@@ -1,6 +1,6 @@
 package redis
 
-import "gitlab.ost.ch/ins/jalapeno-api/graph-db-feeder/arangodb"
+import "gitlab.ost.ch/ins/jalapeno-api/cache-service/arangodb"
 
 func ConvertToRedisLsNode(document arangodb.LsNodeDocument) LsNodeDocument {
 	return LsNodeDocument{

@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
-	"gitlab.ost.ch/ins/jalapeno-api/graph-db-feeder/events"
-	"gitlab.ost.ch/ins/jalapeno-api/graph-db-feeder/kafka"
-	"gitlab.ost.ch/ins/jalapeno-api/graph-db-feeder/redis"
+	"gitlab.ost.ch/ins/jalapeno-api/cache-service/events"
+	"gitlab.ost.ch/ins/jalapeno-api/cache-service/kafka"
+	"gitlab.ost.ch/ins/jalapeno-api/cache-service/redis"
 )
 
 // Events
@@ -21,7 +21,7 @@ type KafkaEventMessage struct {
 }
 
 func main() {
-	log.Print("Starting GraphDbFeeder ...")
+	log.Print("Starting Cache Service ...")
 	redis.InitializeRedisClient()
 	kafka.StartEventConsumption()
 	redis.InitializeCache()

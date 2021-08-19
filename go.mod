@@ -1,4 +1,4 @@
-module gitlab.ost.ch/ins/jalapeno-api/graph-db-feeder
+module gitlab.ost.ch/ins/jalapeno-api/cache-service
 
 go 1.16
 

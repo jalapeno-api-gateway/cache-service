@@ -1,18 +1,12 @@
 # graph-db-feeder
 
-## gRPC
-- When the file `proto/graph-db-feeder.proto` is updated, this command needs to be run to recompile the code:
-```bash
-$ /bin/protoc/bin/protoc --proto_path=./proto --go_out=./proto --go_opt=paths=source_relative --go-grpc_out=./proto --go-grpc_opt=paths=source_relative ./proto/graph-db-feeder.proto
-```
-
 ## Setting Up Development Environment
 Make sure you have setup the [global development environment](https://gitlab.ost.ch/ins/jalapeno-api/request-service/-/wikis/Development-Environment) first.
 
 ### Step 1: Initialize Okteto
 - Clone the repository:
 ```bash
-$ git clone ssh://git@gitlab.ost.ch:45022/ins/jalapeno-api/graph-db-feeder.git
+$ git clone ssh://git@gitlab.ost.ch:45022/ins/jalapeno-api/cache-service.git
 ```
 - Initialize okteto:
 ```bash
@@ -20,7 +14,7 @@ $ okteto init
 ```
 - Replace content of okteto.yml with the following:
 ```yml
-name: graph-db-feeder
+name: cache-service
 autocreate: true
 image: okteto/golang:1
 command: bash
