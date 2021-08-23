@@ -18,7 +18,7 @@ name: cache-service
 autocreate: true
 image: okteto/golang:1
 command: bash
-namespace: jagw-dev-<namespace-name>
+namespace: <namespace-name>
 securityContext:
   capabilities:
     add:
@@ -40,7 +40,7 @@ environment:
   - ARANGO_DB_PASSWORD=jalapeno
   - ARANGO_DB_NAME=jalapeno
   - REDIS_PASSWORD=a-very-complex-password-here
-  - SENTINEL_ADDRESS=sentinel.jagw-dev-michel.svc.cluster.local:5000
+  - SENTINEL_ADDRESS=sentinel.<namespace-name>.svc.cluster.local:5000
   - SENTINEL_MASTER=mymaster
   - KAFKA_ADDRESS=10.20.1.24:30092
   - LSNODE_KAFKA_TOPIC=gobmp.parsed.ls_node_events
