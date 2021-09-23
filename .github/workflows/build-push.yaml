@@ -1,9 +1,8 @@
 name: build_and_push
 
 on:
-  push:
-    branches:
-      - "cicd"
+  release:
+    types: [published]
 
 jobs:
   docker:
