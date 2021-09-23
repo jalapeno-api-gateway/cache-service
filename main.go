@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
-	"gitlab.ost.ch/ins/jalapeno-api/cache-service/events"
-	"gitlab.ost.ch/ins/jalapeno-api/cache-service/kafka"
-	"gitlab.ost.ch/ins/jalapeno-api/cache-service/redis"
+	"github.com/jalapeno-api-gateway/cache-service/events"
+	"github.com/jalapeno-api-gateway/cache-service/kafka"
+	"github.com/jalapeno-api-gateway/cache-service/redis"
 )
 
 // Events

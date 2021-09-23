@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"gitlab.ost.ch/ins/jalapeno-api/cache-service/arangodb"
-	"gitlab.ost.ch/ins/jalapeno-api/cache-service/kafka"
-	"gitlab.ost.ch/ins/jalapeno-api/cache-service/redis"
+	"github.com/jalapeno-api-gateway/cache-service/arangodb"
+	"github.com/jalapeno-api-gateway/cache-service/kafka"
+	"github.com/jalapeno-api-gateway/cache-service/redis"
 )
 
 func StartEventProcessing() {

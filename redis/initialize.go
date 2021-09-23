@@ -3,7 +3,7 @@ package redis
 import (
 	"context"
 
-	"gitlab.ost.ch/ins/jalapeno-api/cache-service/arangodb"
+	"github.com/jalapeno-api-gateway/cache-service/arangodb"
 )
 
 func InitializeCache() {

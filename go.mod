@@ -1,4 +1,4 @@
-module gitlab.ost.ch/ins/jalapeno-api/cache-service
+module github.com/jalapeno-api-gateway/cache-service
 
 go 1.16
 
