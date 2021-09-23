@@ -30,6 +30,6 @@ jobs:
           push: true
           tags: |
             insost/jagw-cache-service:latest
-            insost/jagw-cache-service:${{ steps.get_release.outputs.upload_url }}
+            insost/jagw-cache-service:${{ steps.get_release.outputs.tag_name }}
             ghcr.io/jalapeno-api-gateway/jagw-cache-service:latest
-            ghcr.io/jalapeno-api-gateway/jagw-cache-service:${{ steps.get_release.outputs.upload_url }}
+            ghcr.io/jalapeno-api-gateway/jagw-cache-service:${{ steps.get_release.outputs.tag_name }}
