@@ -1,8 +1,8 @@
 package redis
 
-import "github.com/jalapeno-api-gateway/cache-service/arangodb"
+import "github.com/jalapeno-api-gateway/arangodb-adapter/arango"
 
-func ConvertToRedisLsNode(document arangodb.LsNodeDocument) LsNodeDocument {
+func ConvertToRedisLsNode(document arango.LsNodeDocument) LsNodeDocument {
 	return LsNodeDocument{
 		Id: document.Id,
 		Key: document.Key,
@@ -12,7 +12,7 @@ func ConvertToRedisLsNode(document arangodb.LsNodeDocument) LsNodeDocument {
 	}
 }
 
-func ConvertToRedisLsLink(document arangodb.LsLinkDocument) LsLinkDocument {
+func ConvertToRedisLsLink(document arango.LsLinkDocument) LsLinkDocument {
 	return LsLinkDocument{
 		Id: document.Id,
 		Key: document.Key,

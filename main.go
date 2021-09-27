@@ -2,30 +2,29 @@ package main
 
 import (
 	"log"
+	"os"
 
+	"github.com/jalapeno-api-gateway/arangodb-adapter/arango"
 	"github.com/jalapeno-api-gateway/cache-service/events"
 	"github.com/jalapeno-api-gateway/cache-service/kafka"
 	"github.com/jalapeno-api-gateway/cache-service/redis"
 )
 
-// Events
-var lsNodeEventsChannel = make(chan KafkaEventMessage)
-var lsLinkEventsChannel = make(chan KafkaEventMessage)
-
-
-type KafkaEventMessage struct {
-	TopicType	int 	`json:"TopicType,omitempty"`
-	Key			string	`json:"_key,omitempty"`
-	Id			string	`json:"_id,omitempty"`
-	Action		string	`json:"action,omitempty"`
-}
-
 func main() {
 	log.Print("Starting Cache Service ...")
+	arango.InitializeArangoDbAdapter(getDefaultArangoDbConfig())
 	redis.InitializeRedisClient()
 	kafka.StartEventConsumption()
 	redis.InitializeCache()
 	events.StartEventProcessing()
 }
 
+func getDefaultArangoDbConfig() arango.ArangoDbConfig {
+	return arango.ArangoDbConfig{
+		Server: os.Getenv("ARANGO_DB"),
+		User: os.Getenv("ARANGO_DB_USER"),
+		Password: os.Getenv("ARANGO_DB_PASSWORD"),
+		DbName: os.Getenv("ARANGO_DB_NAME"),
+	}
+}
 

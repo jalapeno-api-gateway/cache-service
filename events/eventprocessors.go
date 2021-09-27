@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/jalapeno-api-gateway/cache-service/arangodb"
+	"github.com/jalapeno-api-gateway/arangodb-adapter/arango"
 	"github.com/jalapeno-api-gateway/cache-service/kafka"
 	"github.com/jalapeno-api-gateway/cache-service/redis"
 )
@@ -26,7 +26,7 @@ func handleLsNodeEvent(event kafka.KafkaEventMessage) {
 	if (event.Action == "del") {
 		redis.DeleteKey(ctx, event.Key)
 	} else {
-		updatedDocument := arangodb.FetchLsNode(ctx, event.Key)
+		updatedDocument := arango.FetchLsNode(ctx, event.Key)
 		redis.CacheLsNode(updatedDocument.Id, redis.ConvertToRedisLsNode(updatedDocument))
 	}
 }
@@ -37,7 +37,7 @@ func handleLsLinkEvent(event kafka.KafkaEventMessage) {
 		redis.DeleteKey(ctx, event.Key)
 		log.Printf("LsLink [%s]: %s\n", event.Action, event.Key)
 	} else {
-		updatedDocument := arangodb.FetchLsLink(ctx, event.Key)
+		updatedDocument := arango.FetchLsLink(ctx, event.Key)
 		log.Printf("LsLink [%s]: IGP Metric: %d\n", event.Action, updatedDocument.Igp_metric)
 		redis.CacheLsLink(updatedDocument.Id, redis.ConvertToRedisLsLink(updatedDocument))
 	}
