@@ -6,7 +6,7 @@ import (
 	"github.com/jalapeno-api-gateway/arangodb-adapter/arango"
 	"github.com/jalapeno-api-gateway/cache-service/kafka"
 	"github.com/jalapeno-api-gateway/cache-service/redis"
-	"github.com/jalapeno-api-gateway/model"
+	"github.com/jalapeno-api-gateway/model/topology"
 )
 
 type EventType string
@@ -45,16 +45,16 @@ func fetchDocument(ctx context.Context, key string, eventType EventType) (string
 	switch eventType {
 		case LSNodeEvent:
 			doc := arango.FetchLSNode(ctx, key)
-			return doc.ID, model.ConvertLSNode(doc)
+			return doc.ID, topology.ConvertLSNode(doc)
 		case LSLinkEvent:
 			doc := arango.FetchLSLink(ctx, key)
-			return doc.ID, model.ConvertLSLink(doc)
+			return doc.ID, topology.ConvertLSLink(doc)
 		case LSPrefixEvent:
 			doc := arango.FetchLSPrefix(ctx, key)
-			return doc.ID, model.ConvertLSPrefix(doc)
+			return doc.ID, topology.ConvertLSPrefix(doc)
 		case LSSIDv6SIDEvent:
 			doc := arango.FetchLSSRv6SID(ctx, key)
-			return doc.ID, model.ConvertLSSRv6SID(doc)
+			return doc.ID, topology.ConvertLSSRv6SID(doc)
 		default: return "", nil
 	}
 }
