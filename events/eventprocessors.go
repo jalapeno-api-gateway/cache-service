@@ -2,43 +2,59 @@ package events
 
 import (
 	"context"
-	"log"
 
 	"github.com/jalapeno-api-gateway/arangodb-adapter/arango"
 	"github.com/jalapeno-api-gateway/cache-service/kafka"
 	"github.com/jalapeno-api-gateway/cache-service/redis"
+	"github.com/jalapeno-api-gateway/model"
+)
+
+type EventType string
+
+const (
+	LSNodeEvent EventType = "LSNodeEvent"
+	LSLinkEvent EventType = "LSLinkEvent"
+	LSPrefixEvent EventType = "LSPrefixEvent"
+	LSSIDv6SIDEvent EventType = "LSSIDv6SIDEvent"
+	PhysicalInterfaceTelemetryEvent EventType = "PhysicalInterfaceTelemetryEvent"
+	LoopbackInterfaceTelemetryEvent EventType = "LoopbackInterfaceTelemetryEvent"
 )
 
 func StartEventProcessing() {
 	for {
 		select {
-		case event := <-kafka.LsNodeEvents:
-			handleLsNodeEvent(event)
-		case event := <-kafka.LsLinkEvents:
-			handleLsLinkEvent(event)
+			case event := <-kafka.LSNodeEvents: handleEvent(event, LSNodeEvent)
+			case event := <-kafka.LSLinkEvents: handleEvent(event, LSLinkEvent)
+			case event := <-kafka.LSPrefixEvents: handleEvent(event, LSPrefixEvent)
+			case event := <-kafka.LSSRV6SIDEvents: handleEvent(event, LSSIDv6SIDEvent)
 		}
 	}
 }
 
-func handleLsNodeEvent(event kafka.KafkaEventMessage) {
+func handleEvent(event kafka.KafkaEventMessage, eventType EventType) {
 	ctx := context.Background()
-	log.Printf("LsNode [%s]: %s\n", event.Action, event.Key)
 	if (event.Action == "del") {
 		redis.DeleteKey(ctx, event.Key)
 	} else {
-		updatedDocument := arango.FetchLsNode(ctx, event.Key)
-		redis.CacheLsNode(updatedDocument.Id, redis.ConvertToRedisLsNode(updatedDocument))
+		id, obj := fetchDocument(ctx, event.Key, eventType)
+		redis.CacheObject(id, obj)
 	}
 }
 
-func handleLsLinkEvent(event kafka.KafkaEventMessage) {
-	ctx := context.Background()
-	if (event.Action == "del") {
-		redis.DeleteKey(ctx, event.Key)
-		log.Printf("LsLink [%s]: %s\n", event.Action, event.Key)
-	} else {
-		updatedDocument := arango.FetchLsLink(ctx, event.Key)
-		log.Printf("LsLink [%s]: IGP Metric: %d\n", event.Action, updatedDocument.Igp_metric)
-		redis.CacheLsLink(updatedDocument.Id, redis.ConvertToRedisLsLink(updatedDocument))
+func fetchDocument(ctx context.Context, key string, eventType EventType) (string, interface{}) {
+	switch eventType {
+		case LSNodeEvent:
+			doc := arango.FetchLSNode(ctx, key)
+			return doc.ID, model.ConvertLSNode(doc)
+		case LSLinkEvent:
+			doc := arango.FetchLSLink(ctx, key)
+			return doc.ID, model.ConvertLSLink(doc)
+		case LSPrefixEvent:
+			doc := arango.FetchLSPrefix(ctx, key)
+			return doc.ID, model.ConvertLSPrefix(doc)
+		case LSSIDv6SIDEvent:
+			doc := arango.FetchLSSRv6SID(ctx, key)
+			return doc.ID, model.ConvertLSSRv6SID(doc)
+		default: return "", nil
 	}
 }

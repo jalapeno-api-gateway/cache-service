@@ -1,4 +1,6 @@
 package kafka
 
-var LsNodeEvents = make(chan KafkaEventMessage)
-var LsLinkEvents = make(chan KafkaEventMessage)
+var LSNodeEvents = make(chan KafkaEventMessage)
+var LSLinkEvents = make(chan KafkaEventMessage)
+var LSPrefixEvents = make(chan KafkaEventMessage)
+var LSSRV6SIDEvents = make(chan KafkaEventMessage)
