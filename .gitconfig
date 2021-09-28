@@ -1,0 +1,2 @@
+[url "ssh://git@github.com/jalapeno-api-gateway/"]
+	insteadOf = https://github.com/jalapeno-api-gateway/
