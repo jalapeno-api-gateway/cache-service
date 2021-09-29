@@ -16,8 +16,6 @@ const (
 	LSLinkEvent EventType = "LSLinkEvent"
 	LSPrefixEvent EventType = "LSPrefixEvent"
 	LSSIDv6SIDEvent EventType = "LSSIDv6SIDEvent"
-	PhysicalInterfaceTelemetryEvent EventType = "PhysicalInterfaceTelemetryEvent"
-	LoopbackInterfaceTelemetryEvent EventType = "LoopbackInterfaceTelemetryEvent"
 )
 
 func StartEventProcessing() {

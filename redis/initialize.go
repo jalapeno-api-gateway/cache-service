@@ -2,10 +2,21 @@ package redis
 
 import (
 	"context"
+	"os"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/jalapeno-api-gateway/arangodb-adapter/arango"
 	"github.com/jalapeno-api-gateway/model/topology"
 )
+
+func InitializeRedisClient() {
+	redisClient = redis.NewFailoverClient(&redis.FailoverOptions{
+		MasterName:    os.Getenv("SENTINEL_MASTER"),
+		SentinelAddrs: []string{os.Getenv("SENTINEL_ADDRESS")},
+		Password:      os.Getenv("REDIS_PASSWORD"),
+		DB:            0,
+	})
+}
 
 func InitializeCache() {
 	loadLSNodeCollection()

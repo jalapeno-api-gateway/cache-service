@@ -13,7 +13,13 @@ func StartEventConsumption() {
 
 	go func() {	
 		defer func() {
-			closeConsumers(consumer, lsNodeEventsConsumer, lsLinkEventsConsumer)
+			closeConsumers(
+				consumer,
+				lsNodeEventsConsumer,
+				lsLinkEventsConsumer,
+				lsPrefixEventsConsumer,
+				lsSRV6SIDEventsConsumer,
+			)
 		}()
 		
 		for {
