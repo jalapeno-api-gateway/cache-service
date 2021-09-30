@@ -1,7 +1,6 @@
 package kafka
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -9,7 +8,7 @@ import (
 )
 
 func newSaramaConsumer() sarama.Consumer {
-	consumer, err := sarama.NewConsumer([]string{fmt.Sprintf("http://%s", os.Getenv("KAFKA_ADDRESS"))}, sarama.NewConfig())
+	consumer, err := sarama.NewConsumer([]string{os.Getenv("KAFKA_ADDRESS")}, sarama.NewConfig())
 	if err != nil {
 		panic(err)
 	}
