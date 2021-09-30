@@ -8,10 +8,8 @@ import (
 	"github.com/Shopify/sarama"
 )
 
-const KAFKA_PORT = 30092
-
 func newSaramaConsumer() sarama.Consumer {
-	consumer, err := sarama.NewConsumer([]string{fmt.Sprintf("http://%s:%d", os.Getenv("JALAPENO_SERVER"), KAFKA_PORT)}, sarama.NewConfig())
+	consumer, err := sarama.NewConsumer([]string{fmt.Sprintf("http://%s", os.Getenv("KAFKA_ADDRESS"))}, sarama.NewConfig())
 	if err != nil {
 		panic(err)
 	}
