@@ -1,15 +1,11 @@
 package kafka
 
-import (
-	"os"
-)
-
 func StartEventConsumption() {
 	consumer := newSaramaConsumer()
-	lsNodeEventsConsumer := newPartitionConsumer(consumer, os.Getenv("LSNODE_KAFKA_TOPIC"))
-	lsLinkEventsConsumer := newPartitionConsumer(consumer, os.Getenv("LSLINK_KAFKA_TOPIC"))
-	lsPrefixEventsConsumer := newPartitionConsumer(consumer, os.Getenv("LSPREFIX_KAFKA_TOPIC"))
-	lsSRV6SIDEventsConsumer := newPartitionConsumer(consumer, os.Getenv("LSSRV6SID_KAFKA_TOPIC"))
+	lsNodeEventsConsumer := newPartitionConsumer(consumer, LSNODE_KAFKA_TOPIC)
+	lsLinkEventsConsumer := newPartitionConsumer(consumer, LSLINK_KAFKA_TOPIC)
+	lsPrefixEventsConsumer := newPartitionConsumer(consumer, LSPREFIX_KAFKA_TOPIC)
+	lsSRV6SIDEventsConsumer := newPartitionConsumer(consumer, LSSRV6SID_KAFKA_TOPIC)
 
 	go func() {	
 		defer func() {

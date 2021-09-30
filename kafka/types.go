@@ -6,3 +6,9 @@ type KafkaEventMessage struct {
 	Id			string	`json:"_id,omitempty"`
 	Action		string	`json:"action,omitempty"`
 }
+
+const LSNODE_KAFKA_TOPIC = "gobmp.parsed.ls_node_events"
+const LSLINK_KAFKA_TOPIC = "gobmp.parsed.ls_link_events"
+const LSPREFIX_KAFKA_TOPIC = "gobmp.parsed.ls_prefix_events"
+const LSSRV6SID_KAFKA_TOPIC = "gobmp.parsed.ls_srv6_sid_events"
+const TELEMETRY_KAFKA_TOPIC = "jalapeno.telemetry"
