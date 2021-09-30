@@ -5,6 +5,7 @@ WORKDIR /tmp/cache-service
 
 COPY go.mod .
 COPY go.sum .
+RUN go env -w GOPRIVATE=github.com/jalapeno-api-gateway/*
 RUN go mod download
 
 COPY . .
