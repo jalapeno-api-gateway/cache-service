@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/jalapeno-api-gateway/arangodb-adapter/arango"
-	"github.com/jalapeno-api-gateway/model/topology"
+	"github.com/jalapeno-api-gateway/jagw-core/arango"
+	"github.com/jalapeno-api-gateway/jagw-core/model/topology"
 )
 
 func InitializeRedisClient() {
