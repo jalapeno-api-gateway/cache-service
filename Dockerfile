@@ -5,6 +5,8 @@ WORKDIR /tmp/cache-service
 
 COPY go.mod .
 COPY go.sum .
+RUN go clean --modcache
+RUN go mod tidy
 RUN go mod download
 
 COPY . .
