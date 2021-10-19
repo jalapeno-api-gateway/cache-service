@@ -5,7 +5,7 @@ WORKDIR /tmp/cache-service
 
 COPY go.mod .
 COPY go.sum .
-RUN go mod download
+RUN go mod download -json
 
 COPY . .
 RUN CGO_ENABLED=0 go build -o ./out/cache-service .
