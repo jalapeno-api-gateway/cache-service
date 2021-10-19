@@ -24,6 +24,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Clean modcache
+        run: go clean --modcache
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
