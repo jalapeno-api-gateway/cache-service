@@ -5,5 +5,5 @@ go 1.16
 require (
 	github.com/Shopify/sarama v1.29.1
 	github.com/go-redis/redis/v8 v8.11.3
-	github.com/jalapeno-api-gateway/jagw-core v1.0.0-beta.0.20211019063655-f33f1cf9fc6a
+	github.com/jalapeno-api-gateway/jagw-core v1.0.0-beta.0.20211019161825-6134912a58d7
 )
