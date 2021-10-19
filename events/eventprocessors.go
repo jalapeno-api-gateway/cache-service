@@ -17,6 +17,7 @@ func StartEventProcessing() {
 			case event := <-kafka.LsLinkEvents: handleEvent(event, class.LsLink)
 			case event := <-kafka.LsPrefixEvents: handleEvent(event, class.LsPrefix)
 			case event := <-kafka.LsSrv6SidEvents: handleEvent(event, class.LsSrv6Sid)
+			case event := <-kafka.LsNodeEdgeEvents: handleEvent(event, class.LsNodeEdge)
 		}
 	}
 }
@@ -45,6 +46,9 @@ func fetchDocument(ctx context.Context, key string, className class.Class) (stri
 		case class.LsSrv6Sid:
 			doc := arango.FetchLsSrv6Sid(ctx, key)
 			return doc.ID, topology.ConvertLsSrv6Sid(doc)
+		case class.LsNodeEdge:
+			doc := arango.FetchLsNodeEdge(ctx, key)
+			return doc.ID, topology.ConvertLsNodeEdge(doc)
 		default: return "", nil
 	}
 }

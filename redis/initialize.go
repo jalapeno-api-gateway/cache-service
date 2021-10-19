@@ -23,6 +23,7 @@ func InitializeCache() {
 	loadLsLinkCollection()
 	loadLsPrefixCollection()
 	loadLsSrv6SidCollection()
+	loadLsNodeEdgeCollection()
 }
 
 func loadLsNodeCollection() {
@@ -54,5 +55,13 @@ func loadLsSrv6SidCollection() {
 	documents := arango.FetchAllLsSrv6Sids(ctx)
 	for _, document := range documents {
 		CacheObject(document.ID, topology.ConvertLsSrv6Sid(document))
+	}
+}
+
+func loadLsNodeEdgeCollection() {
+	ctx := context.Background()
+	documents := arango.FetchAllLsNodeEdges(ctx)
+	for _, document := range documents {
+		CacheObject(document.ID, topology.ConvertLsNodeEdge(document))
 	}
 }
