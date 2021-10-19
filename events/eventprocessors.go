@@ -13,10 +13,10 @@ import (
 func StartEventProcessing() {
 	for {
 		select {
-			case event := <-kafka.LSNodeEvents: handleEvent(event, class.LSNode)
-			case event := <-kafka.LSLinkEvents: handleEvent(event, class.LSLink)
-			case event := <-kafka.LSPrefixEvents: handleEvent(event, class.LSPrefix)
-			case event := <-kafka.LSSRV6SIDEvents: handleEvent(event, class.LSSRv6SID)
+			case event := <-kafka.LsNodeEvents: handleEvent(event, class.LsNode)
+			case event := <-kafka.LsLinkEvents: handleEvent(event, class.LsLink)
+			case event := <-kafka.LsPrefixEvents: handleEvent(event, class.LsPrefix)
+			case event := <-kafka.LsSrv6SidEvents: handleEvent(event, class.LsSrv6Sid)
 		}
 	}
 }
@@ -33,18 +33,18 @@ func handleEvent(event kafka.KafkaEventMessage, className class.Class) {
 
 func fetchDocument(ctx context.Context, key string, className class.Class) (string, interface{}) {
 	switch className {
-		case class.LSNode:
-			doc := arango.FetchLSNode(ctx, key)
-			return doc.ID, topology.ConvertLSNode(doc)
-		case class.LSLink:
-			doc := arango.FetchLSLink(ctx, key)
-			return doc.ID, topology.ConvertLSLink(doc)
-		case class.LSPrefix:
-			doc := arango.FetchLSPrefix(ctx, key)
-			return doc.ID, topology.ConvertLSPrefix(doc)
-		case class.LSSRv6SID:
-			doc := arango.FetchLSSRv6SID(ctx, key)
-			return doc.ID, topology.ConvertLSSRv6SID(doc)
+		case class.LsNode:
+			doc := arango.FetchLsNode(ctx, key)
+			return doc.ID, topology.ConvertLsNode(doc)
+		case class.LsLink:
+			doc := arango.FetchLsLink(ctx, key)
+			return doc.ID, topology.ConvertLsLink(doc)
+		case class.LsPrefix:
+			doc := arango.FetchLsPrefix(ctx, key)
+			return doc.ID, topology.ConvertLsPrefix(doc)
+		case class.LsSrv6Sid:
+			doc := arango.FetchLsSrv6Sid(ctx, key)
+			return doc.ID, topology.ConvertLsSrv6Sid(doc)
 		default: return "", nil
 	}
 }

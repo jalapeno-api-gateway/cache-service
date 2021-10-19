@@ -21,13 +21,13 @@ func StartEventConsumption() {
 		for {
 			select {
 			case msg := <-lsNodeEventsConsumer.Messages():
-				LSNodeEvents <- unmarshalKafkaMessage(msg)
+				LsNodeEvents <- unmarshalKafkaMessage(msg)
 			case msg := <-lsLinkEventsConsumer.Messages():
-				LSLinkEvents <- unmarshalKafkaMessage(msg)
+				LsLinkEvents <- unmarshalKafkaMessage(msg)
 			case msg := <-lsPrefixEventsConsumer.Messages():
-				LSPrefixEvents <- unmarshalKafkaMessage(msg)
+				LsPrefixEvents <- unmarshalKafkaMessage(msg)
 			case msg := <-lsSRV6SIDEventsConsumer.Messages():
-				LSSRV6SIDEvents <- unmarshalKafkaMessage(msg)
+				LsSrv6SidEvents <- unmarshalKafkaMessage(msg)
 			}
 		}
 	}()

@@ -19,40 +19,40 @@ func InitializeRedisClient() {
 }
 
 func InitializeCache() {
-	loadLSNodeCollection()
-	loadLSLinkCollection()
-	loadLSPrefixCollection()
-	loadLSSRv6SIDCollection()
+	loadLsNodeCollection()
+	loadLsLinkCollection()
+	loadLsPrefixCollection()
+	loadLsSrv6SidCollection()
 }
 
-func loadLSNodeCollection() {
+func loadLsNodeCollection() {
 	ctx := context.Background()
-	documents := arango.FetchAllLSNodes(ctx)
+	documents := arango.FetchAllLsNodes(ctx)
 	for _, document := range documents {
-		CacheObject(document.ID, topology.ConvertLSNode(document))
+		CacheObject(document.ID, topology.ConvertLsNode(document))
 	}
 }
 
-func loadLSLinkCollection() {
+func loadLsLinkCollection() {
 	ctx := context.Background()
-	documents := arango.FetchAllLSLinks(ctx)
+	documents := arango.FetchAllLsLinks(ctx)
 	for _, document := range documents {
-		CacheObject(document.ID, topology.ConvertLSLink(document))
+		CacheObject(document.ID, topology.ConvertLsLink(document))
 	}
 }
 
-func loadLSPrefixCollection() {
+func loadLsPrefixCollection() {
 	ctx := context.Background()
-	documents := arango.FetchAllLSPrefix(ctx)
+	documents := arango.FetchAllLsPrefixes(ctx)
 	for _, document := range documents {
-		CacheObject(document.ID, topology.ConvertLSPrefix(document))
+		CacheObject(document.ID, topology.ConvertLsPrefix(document))
 	}
 }
 
-func loadLSSRv6SIDCollection() {
+func loadLsSrv6SidCollection() {
 	ctx := context.Background()
-	documents := arango.FetchAllLSSRv6SID(ctx)
+	documents := arango.FetchAllLsSrv6Sids(ctx)
 	for _, document := range documents {
-		CacheObject(document.ID, topology.ConvertLSSRv6SID(document))
+		CacheObject(document.ID, topology.ConvertLsSrv6Sid(document))
 	}
 }

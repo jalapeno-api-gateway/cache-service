@@ -58,8 +58,14 @@ github.com/gorilla/sessions v1.2.1/go.mod h1:dk2InVEVJ0sfLlnXv9EAgkf6ecYs/i80K/z
 github.com/hashicorp/go-uuid v1.0.2 h1:cfejS+Tpcp13yd5nYHWDI6qVCny6wyX2Mt5SGur2IGE=
 github.com/hashicorp/go-uuid v1.0.2/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
-github.com/jalapeno-api-gateway/jagw-core v0.0.0-20210930064513-e633e346a58f h1:Ce2oh+Ce6bj3eN1cxdC2eAlauHpcGkRBNyhzuUjQ33I=
-github.com/jalapeno-api-gateway/jagw-core v0.0.0-20210930064513-e633e346a58f/go.mod h1:fkZdojcIvilo+8KXYGsuK7YV68tT2dAIf9i2FvGQPCM=
+github.com/jalapeno-api-gateway/jagw-core v1.0.0-beta h1:JbhrA8PO22tZPx2Ok3IkxTcbnnNNw306O3HjN5fkpH8=
+github.com/jalapeno-api-gateway/jagw-core v1.0.0-beta/go.mod h1:fkZdojcIvilo+8KXYGsuK7YV68tT2dAIf9i2FvGQPCM=
+github.com/jalapeno-api-gateway/jagw-core v1.0.0-beta.0.20211019061503-f2c66eec4aca h1:rIZzaA/nB8xnywtmPKP2W8BL3HyKxFWO8buI6MssKv4=
+github.com/jalapeno-api-gateway/jagw-core v1.0.0-beta.0.20211019061503-f2c66eec4aca/go.mod h1:fkZdojcIvilo+8KXYGsuK7YV68tT2dAIf9i2FvGQPCM=
+github.com/jalapeno-api-gateway/jagw-core v1.0.0-beta.0.20211019063255-60677ab30c7f h1:N10/vp5OU8CS1ElIiXUi0WBXAhj0ZUIW3KtwhpSGiRM=
+github.com/jalapeno-api-gateway/jagw-core v1.0.0-beta.0.20211019063255-60677ab30c7f/go.mod h1:fkZdojcIvilo+8KXYGsuK7YV68tT2dAIf9i2FvGQPCM=
+github.com/jalapeno-api-gateway/jagw-core v1.0.0-beta.0.20211019063655-f33f1cf9fc6a h1:STu2ea6As1DRLBQZdSMzWPbeZccJSjCKjyaR6ylYDWQ=
+github.com/jalapeno-api-gateway/jagw-core v1.0.0-beta.0.20211019063655-f33f1cf9fc6a/go.mod h1:fkZdojcIvilo+8KXYGsuK7YV68tT2dAIf9i2FvGQPCM=
 github.com/jcmturner/aescts/v2 v2.0.0 h1:9YKLH6ey7H4eDBXW8khjYslgyqG2xZikXP0EQFKrle8=
 github.com/jcmturner/aescts/v2 v2.0.0/go.mod h1:AiaICIRyfYg35RUkr8yESTqvSy7csK90qZ5xfvvsoNs=
 github.com/jcmturner/dnsutils/v2 v2.0.0 h1:lltnkeZGL0wILNvrNiVCR6Ro5PGU/SeBvVO/8c/iPbo=
