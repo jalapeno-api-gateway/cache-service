@@ -1,10 +1,14 @@
-FROM golang:1.17-alpine AS build_base
+FROM golang:1.16-alpine AS build_base
 
+RUN go clean --modcache
 RUN apk add --no-cache git
+RUN go clean --modcache
 WORKDIR /tmp/cache-service
 
+RUN go clean --modcache
 COPY go.mod .
 COPY go.sum .
+RUN go clean --modcache
 RUN go mod download
 
 COPY . .
