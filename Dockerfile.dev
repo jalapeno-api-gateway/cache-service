@@ -8,13 +8,8 @@ COPY go.sum .
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=0 go build -o ./out/cache-service .
+RUN CGO_ENABLED=0 go build -o  /usr/bin/cache-service .
 
-FROM scratch
-LABEL maintainer="Julian Klaiber"
-
-COPY --from=build_base /tmp/cache-service/out/cache-service /usr/bin/cache-service
+LABEL maintainer="Michel Bongard"
 
 ENTRYPOINT [ "/usr/bin/cache-service" ]
-
-
