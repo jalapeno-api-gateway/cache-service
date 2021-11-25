@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"log"
 	"os"
 
 	"github.com/go-redis/redis/v8"
@@ -71,6 +72,7 @@ func loadLsNodeCoordinatesCollection() {
 	ctx := context.Background()
 	documents := arango.FetchAllLsNodeCoordinates(ctx)
 	for _, document := range documents {
+		log.Printf("%s\n", document.Key)
 		CacheObject(document.ID, topology.ConvertLsNodeCoordinates(document))
 	}
 }
