@@ -14,10 +14,15 @@ import (
 func main() {
 	log.Print("Starting Cache Service ...")
 	arango.InitializeArangoDbAdapter(getDefaultArangoDbConfig())
+	log.Print("1")
 	redis.InitializeRedisClient()
+	log.Print("2")
 	kafka.StartEventConsumption()
+	log.Print("3")
 	redis.InitializeCache()
+	log.Print("4")
 	events.StartEventProcessing()
+	log.Print("5")
 }
 
 func getDefaultArangoDbConfig() arango.ArangoDbConfig {
