@@ -3,14 +3,17 @@ package events
 import (
 	"context"
 
-	"github.com/jalapeno-api-gateway/jagw-core/arango"
 	"github.com/jalapeno-api-gateway/cache-service/kafka"
 	"github.com/jalapeno-api-gateway/cache-service/redis"
-	"github.com/jalapeno-api-gateway/jagw-core/model/topology"
+	"github.com/jalapeno-api-gateway/jagw-core/arango"
 	"github.com/jalapeno-api-gateway/jagw-core/model/class"
+	"github.com/jalapeno-api-gateway/jagw-core/model/topology"
+	"github.com/sirupsen/logrus"
 )
 
 func StartEventProcessing() {
+	logrus.Debug("Starting Kafka event processing.")
+
 	for {
 		select {
 			case event := <-kafka.LsNodeEvents: handleEvent(event, class.LsNode)
@@ -23,6 +26,7 @@ func StartEventProcessing() {
 }
 
 func handleEvent(event kafka.KafkaEventMessage, className class.Class) {
+	logrus.WithFields(logrus.Fields{"id": event.Id, "key": event.Key, "action": event.Action}).Trace("Handling incoming Kafka event.")
 	ctx := context.Background()
 	if (event.Action == "del") {
 		redis.DeleteKey(ctx, event.Key)
@@ -49,6 +53,8 @@ func fetchDocument(ctx context.Context, key string, className class.Class) (stri
 		case class.LsNodeEdge:
 			doc := arango.FetchLsNodeEdge(ctx, key)
 			return doc.ID, topology.ConvertLsNodeEdge(doc)
-		default: return "", nil
+		default:
+			logrus.WithFields(logrus.Fields{"key": key, "className": className}).Panic("ClassName not implemented.")
 	}
+	return "", nil
 }

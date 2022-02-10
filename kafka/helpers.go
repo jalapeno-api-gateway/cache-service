@@ -2,16 +2,16 @@ package kafka
 
 import (
 	"encoding/json"
-	"log"
 
 	"github.com/Shopify/sarama"
+	"github.com/sirupsen/logrus"
 )
 
 func unmarshalKafkaMessage(msg *sarama.ConsumerMessage) KafkaEventMessage {
 	var event KafkaEventMessage
 	err := json.Unmarshal(msg.Value, &event)
 	if err != nil {
-		log.Fatalf("Could not unmarshal kafka message, %v", err)
+		logrus.WithError(err).Panic("Failed to unmarshal Kafka message.")
 	}
 	return event
 }

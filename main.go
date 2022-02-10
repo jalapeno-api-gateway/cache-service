@@ -2,27 +2,27 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/jalapeno-api-gateway/cache-service/events"
 	"github.com/jalapeno-api-gateway/cache-service/kafka"
 	"github.com/jalapeno-api-gateway/cache-service/redis"
 	"github.com/jalapeno-api-gateway/jagw-core/arango"
+	"github.com/jalapeno-api-gateway/jagw-core/logger"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	log.Print("Starting Cache Service ...")
-	arango.InitializeArangoDbAdapter(getDefaultArangoDbConfig())
-	log.Print("1")
+	logger.Init(logrus.StandardLogger(), "debug") // TODO: Pass this default log level through the environment variables through the helm chart
+	logrus.Trace("Starting Cache Service.")
+
+	config := getDefaultArangoDbConfig()
+	arango.InitializeArangoDbAdapter(logrus.StandardLogger(), config)
+
 	redis.InitializeRedisClient()
-	log.Print("2")
 	kafka.StartEventConsumption()
-	log.Print("3")
 	redis.InitializeCache()
-	log.Print("4")
 	events.StartEventProcessing()
-	log.Print("5")
 }
 
 func getDefaultArangoDbConfig() arango.ArangoDbConfig {

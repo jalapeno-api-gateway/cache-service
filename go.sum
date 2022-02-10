@@ -58,8 +58,14 @@ github.com/gorilla/sessions v1.2.1/go.mod h1:dk2InVEVJ0sfLlnXv9EAgkf6ecYs/i80K/z
 github.com/hashicorp/go-uuid v1.0.2 h1:cfejS+Tpcp13yd5nYHWDI6qVCny6wyX2Mt5SGur2IGE=
 github.com/hashicorp/go-uuid v1.0.2/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
-github.com/jalapeno-api-gateway/jagw-core v1.2.0 h1:2JxY+VExemjHY7oYADxvA0gE9ECzSpyj81y/K6ho6DU=
-github.com/jalapeno-api-gateway/jagw-core v1.2.0/go.mod h1:fkZdojcIvilo+8KXYGsuK7YV68tT2dAIf9i2FvGQPCM=
+github.com/jalapeno-api-gateway/jagw-core v1.2.1-0.20220210171003-3847fbd95b3f h1:ZJpr21uVd5KK64xmn19SFZN9xxGyrjhnDTMGI3QLG5w=
+github.com/jalapeno-api-gateway/jagw-core v1.2.1-0.20220210171003-3847fbd95b3f/go.mod h1:+bEuZxhWViZuVh5nNeW5DpuGyt/bmiLM2lCW6++XZkU=
+github.com/jalapeno-api-gateway/jagw-core v1.2.1-0.20220210184843-ef5948b9b47d h1:r9f6aAJXTjdR4ve1TwfGS3Ib2+/mKqrnydzd4zvuovQ=
+github.com/jalapeno-api-gateway/jagw-core v1.2.1-0.20220210184843-ef5948b9b47d/go.mod h1:+bEuZxhWViZuVh5nNeW5DpuGyt/bmiLM2lCW6++XZkU=
+github.com/jalapeno-api-gateway/jagw-core v1.2.1-0.20220210201942-b86e81bcd744 h1:q1fcVwXocY7aKHC46DmsaTnGUhE2iOKD5BhB5RU85+4=
+github.com/jalapeno-api-gateway/jagw-core v1.2.1-0.20220210201942-b86e81bcd744/go.mod h1:+bEuZxhWViZuVh5nNeW5DpuGyt/bmiLM2lCW6++XZkU=
+github.com/jalapeno-api-gateway/jagw-core v1.2.1-0.20220210203330-054df1dad886 h1:UMExW6/Yl6RSsKkaokZiRY6XG6P1vl7cP0wnGSxpJUA=
+github.com/jalapeno-api-gateway/jagw-core v1.2.1-0.20220210203330-054df1dad886/go.mod h1:+bEuZxhWViZuVh5nNeW5DpuGyt/bmiLM2lCW6++XZkU=
 github.com/jcmturner/aescts/v2 v2.0.0 h1:9YKLH6ey7H4eDBXW8khjYslgyqG2xZikXP0EQFKrle8=
 github.com/jcmturner/aescts/v2 v2.0.0/go.mod h1:AiaICIRyfYg35RUkr8yESTqvSy7csK90qZ5xfvvsoNs=
 github.com/jcmturner/dnsutils/v2 v2.0.0 h1:lltnkeZGL0wILNvrNiVCR6Ro5PGU/SeBvVO/8c/iPbo=
@@ -102,7 +108,10 @@ github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 h1:N/ElC8H3+5X
 github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/rs/xid v1.2.1/go.mod h1:+uKXf+4Djp6Md1KODXJxgGQPKngRmWyn10oCKFzNHOQ=
 github.com/rs/zerolog v1.19.0/go.mod h1:IzD0RJ65iWH0w97OQQebJEvTZYvsCUm9WVLWBQrJRjo=
+github.com/sirupsen/logrus v1.8.1 h1:dJKuHgqk1NNQlqoA6BTlM1Wf9DOH3NBjQyu0h9+AZZE=
+github.com/sirupsen/logrus v1.8.1/go.mod h1:yWOB1SBYBC5VeMP7gHvWumXLIWorT60ONWic61uBYv0=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
+github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
@@ -138,6 +147,7 @@ golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5h
 golang.org/x/sys v0.0.0-20190412213103-97732733099d/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20190904154756-749cb33beabd/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20191005200804-aed5e4c7ecf9/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20191026070338-33540a1f6037/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20191120155948-bd437916bb0e/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
