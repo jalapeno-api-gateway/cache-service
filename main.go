@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	logger.Init(logrus.StandardLogger(), "debug") // TODO: Pass this default log level through the environment variables through the helm chart
+	logger.Init(logrus.StandardLogger(), os.Getenv("LOG_LEVEL")) // TODO: Pass this default log level through the environment variables through the helm chart
 	logrus.Trace("Starting Cache Service.")
 
 	config := getDefaultArangoDbConfig()
