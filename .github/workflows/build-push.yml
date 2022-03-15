@@ -1,0 +1,43 @@
+name: build_and_push
+
+on:
+  workflow_call:
+    secrets:
+      dockerhub_username:
+        required: true
+      dockerhub_token:
+        required: true
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.dockerhub_username }}
+          password: ${{ secrets.dockerhub_token }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ github.token }}
+      - name: Build and push
+        if: github.event.inputs.release_or_dev == 'dev'
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: |
+            insost/jagw-cache-service:${{ github.event.inputs.tag_name }}
+            ghcr.io/jalapeno-api-gateway/jagw-cache-service:${{ github.event.inputs.tag_name }}
+      - name: Build and push
+        if: github.event.inputs.release_or_dev == 'release'
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: |
+            insost/jagw-cache-service:latest
+            insost/jagw-cache-service:${{ github.event.inputs.tag_name }}
+            ghcr.io/jalapeno-api-gateway/jagw-cache-service:latest
+            ghcr.io/jalapeno-api-gateway/jagw-cache-service:${{ github.event.inputs.tag_name }}
