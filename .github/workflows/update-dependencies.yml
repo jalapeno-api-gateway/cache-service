@@ -3,12 +3,6 @@ name: Update Dependencies
 on:
   workflow_call:
     inputs:
-      release_type:
-        type: string
-        required: true
-      tag_name:
-        type: string
-        required: true
       jagw_core_ref:
         type: string
         required: true
