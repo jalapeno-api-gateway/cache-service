@@ -36,7 +36,7 @@ jobs:
       tag_name: ${{ github.event.inputs.tag_name }}
   call-create-release:
     needs: [call-create-tag]
-    uses: jalapeno-api-gateway/jagw-core/.github/workflows/create-release.yml@dev
+    uses: jalapeno-api-gateway/cache-service/.github/workflows/create-release.yml@dev
     if: |
       always() &&
       (needs.call-merge-to-main.result == 'success' || needs.call-merge-to-main.result == 'skipped') &&
@@ -46,7 +46,7 @@ jobs:
       tag_name: ${{ github.event.inputs.tag_name }}
   call-build-push:
     needs: [call-create-tag]
-    uses: jalapeno-api-gateway/jagw-core/.github/workflows/build-push.yml@dev
+    uses: jalapeno-api-gateway/cache-service/.github/workflows/build-push.yml@dev
     if: |
       always() &&
       (needs.call-merge-to-main.result == 'success' || needs.call-merge-to-main.result == 'skipped') &&
