@@ -15,9 +15,11 @@ on:
         required: true
         type: string
       protorepo_jagw_go_commit_sha:
+        description: "Ref used by other go modules to import this version"
         required: true
         type: string
       jagw_core_commit_sha:
+        description: "Ref used by other go modules to import this version"
         required: true
         type: string
 
