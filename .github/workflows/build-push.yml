@@ -32,7 +32,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ github.token }}
       - name: Build and push
-        if: inputs.release_type == "dev"
+        if: inputs.release_type == 'dev'
         uses: docker/build-push-action@v2
         with:
           push: true
@@ -40,7 +40,7 @@ jobs:
             insost/jagw-cache-service:${{ inputs.tag_name }}
             ghcr.io/jalapeno-api-gateway/jagw-cache-service:${{ inputs.tag_name }}
       - name: Build and push
-        if: inputs.release_type == "release"
+        if: inputs.release_type == 'release'
         uses: docker/build-push-action@v2
         with:
           push: true
