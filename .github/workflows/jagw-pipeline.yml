@@ -14,12 +14,20 @@ on:
         description: "Type (dev | release)"
         required: true
         type: string
+      protorepo_jagw_go_commit_sha:
+        required: true
+        type: string
+      jagw_core_commit_sha:
+        required: true
+        type: string
 
 jobs:
   call-update-dependencies:
     uses: jalapeno-api-gateway/cache-service/.github/workflows/update-dependencies.yml@dev
     with:
       tag_name: ${{ github.event.inputs.tag_name }}
+      protorepo_jagw_go_commit_sha: ${{ github.event.inputs.protorepo_jagw_go_commit_sha }}
+      jagw_core_commit_sha: ${{ github.event.inputs.jagw_core_commit_sha }}
   call-merge-to-main:
     needs: call-update-dependencies
     if: github.event.inputs.type == 'release'
