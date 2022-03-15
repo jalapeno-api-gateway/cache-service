@@ -1,35 +1,51 @@
 name: build_and_push
 
 on:
-  release:
-    types: [published]
+  workflow_call:
+    inputs:
+      release_type:
+        description: "Type (dev | release)"
+        type: string
+        required: true
+      tag_name:
+        type: string
+        required: true
+    secrets:
+      dockerhub_username:
+        required: true
+      dockerhub_token:
+        required: true
 
 jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - name: Get release
-        id: get_release
-        uses: bruceadams/get-release@v1.2.3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.dockerhub_username }}
+          password: ${{ secrets.dockerhub_token }}
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ github.token }}
       - name: Build and push
+        if: ${{ inputs.release_type }} == "dev"
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: |
+            insost/jagw-cache-service:${{ inputs.tag_name }}
+            ghcr.io/jalapeno-api-gateway/jagw-cache-service:${{ inputs.tag_name }}
+      - name: Build and push
+        if: ${{ inputs.release_type }} == "release"
         uses: docker/build-push-action@v2
         with:
           push: true
           tags: |
             insost/jagw-cache-service:latest
-            insost/jagw-cache-service:${{ steps.get_release.outputs.tag_name }}
+            insost/jagw-cache-service:${{ inputs.tag_name }}
             ghcr.io/jalapeno-api-gateway/jagw-cache-service:latest
-            ghcr.io/jalapeno-api-gateway/jagw-cache-service:${{ steps.get_release.outputs.tag_name }}
+            ghcr.io/jalapeno-api-gateway/jagw-cache-service:${{ inputs.tag_name }}
