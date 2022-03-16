@@ -30,7 +30,6 @@ jobs:
           push: true
           tags: |
             insost/jagw-cache-service:${{ github.event.inputs.tag_name }}
-            ghcr.io/jalapeno-api-gateway/jagw-cache-service:${{ github.event.inputs.tag_name }}
       - name: Build and push
         if: github.event.inputs.release_or_dev == 'release'
         uses: docker/build-push-action@v2
