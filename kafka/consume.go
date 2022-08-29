@@ -1,6 +1,7 @@
 package kafka
 
 import (
+	"log"
 	"os"
 
 	"github.com/Shopify/sarama"
@@ -8,6 +9,7 @@ import (
 )
 
 func newSaramaConsumer() sarama.Consumer {
+	sarama.Logger = log.New(os.Stdout, "[sarama] ", log.LstdFlags)
 	consumer, err := sarama.NewConsumer([]string{os.Getenv("KAFKA_ADDRESS")}, sarama.NewConfig())
 	if err != nil {
 		logrus.WithError(err).Panic("Failed to create Sarama Consumer.")

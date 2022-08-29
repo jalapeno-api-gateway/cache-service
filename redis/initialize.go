@@ -16,7 +16,7 @@ func InitializeRedisClient() {
 	redisPassword := os.Getenv("REDIS_PASSWORD")
 
 	logrus.WithFields(logrus.Fields{"sentinelMaster": sentinelMaster, "sentinelAddress": sentinelAddress}).Debug("Initializing Redis client.")
-	
+
 	redisClient = redis.NewFailoverClient(&redis.FailoverOptions{
 		MasterName:    sentinelMaster,
 		SentinelAddrs: []string{sentinelAddress},
@@ -62,7 +62,7 @@ func loadLsPrefixCollection() {
 	logrus.Debug("Loading LsPrefixCollection from ArangoDb.")
 	ctx := context.Background()
 	documents := arango.FetchAllLsPrefixes(ctx)
-	
+
 	logrus.Debug("Writing LsPrefixCollection to Redis cache.")
 	for _, document := range documents {
 		CacheObject(document.ID, topology.ConvertLsPrefix(document))
@@ -73,7 +73,7 @@ func loadLsSrv6SidCollection() {
 	logrus.Debug("Loading LsSrv6SidCollection from ArangoDb.")
 	ctx := context.Background()
 	documents := arango.FetchAllLsSrv6Sids(ctx)
-	
+
 	logrus.Debug("Writing LsSrv6SidCollection to Redis cache.")
 	for _, document := range documents {
 		CacheObject(document.ID, topology.ConvertLsSrv6Sid(document))
@@ -84,7 +84,7 @@ func loadLsNodeEdgeCollection() {
 	logrus.Debug("Loading LsNodeEdgeCollection from ArangoDb.")
 	ctx := context.Background()
 	documents := arango.FetchAllLsNodeEdges(ctx)
-	
+
 	logrus.Debug("Writing LsNodeEdgeCollection to Redis cache.")
 	for _, document := range documents {
 		CacheObject(document.ID, topology.ConvertLsNodeEdge(document))
@@ -95,7 +95,7 @@ func loadLsNodeCoordinatesCollection() {
 	logrus.Debug("Loading LsNodeCoordinatesCollection from ArangoDb.")
 	ctx := context.Background()
 	documents := arango.FetchAllLsNodeCoordinates(ctx)
-	
+
 	logrus.Debug("Writing LsNodeCoordinatesCollection to Redis cache.")
 	for _, document := range documents {
 		CacheObject(document.ID, topology.ConvertLsNodeCoordinates(document))

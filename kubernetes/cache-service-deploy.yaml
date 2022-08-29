@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "cache-service"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "cache-service"
+  template:
+    metadata:
+      labels:
+        app: "cache-service"
+    spec:
+      containers:
+        - image: "insost/jagw-cache-service:dev-30"
+          envFrom:
+            - configMapRef:
+                name: cache-service-config
+            - secretRef:
+                name: cache-service-secret
+          imagePullPolicy: "Always"
+          name: "cache-service"
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "10m"
+            limits:
+              memory: "1024Mi"
+              cpu: "1"
