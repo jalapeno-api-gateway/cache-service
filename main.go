@@ -27,10 +27,9 @@ func main() {
 
 func getDefaultArangoDbConfig() arango.ArangoDbConfig {
 	return arango.ArangoDbConfig{
-		Server: fmt.Sprintf("http://%s", os.Getenv("ARANGO_ADDRESS")),
-		User: os.Getenv("ARANGO_DB_USER"),
+		Server:   fmt.Sprintf("http://%s", os.Getenv("ARANGO_ADDRESS")),
+		User:     os.Getenv("ARANGO_DB_USER"),
 		Password: os.Getenv("ARANGO_DB_PASSWORD"),
-		DbName: os.Getenv("ARANGO_DB_NAME"),
+		DbName:   os.Getenv("ARANGO_DB_NAME"),
 	}
 }
-

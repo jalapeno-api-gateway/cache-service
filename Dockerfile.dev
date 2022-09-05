@@ -1,15 +1,19 @@
-FROM golang:1.16-alpine AS build_base
+FROM golang:1.18-buster AS build
 
-RUN apk add --no-cache git
-WORKDIR /tmp/cache-service
+# install xz required to uncompress watchexec
+RUN apt-get -qq update && \
+    apt-get -q -y install xz-utils && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY go.mod .
-COPY go.sum .
+# install watchexec
+ARG WATCHEXEC_VERSION=1.17.1
+RUN curl -sSfL https://github.com/watchexec/watchexec/releases/download/cli-v${WATCHEXEC_VERSION}/watchexec-${WATCHEXEC_VERSION}-$(uname -m)-unknown-linux-gnu.tar.xz | \
+    tar -C /usr/local/bin --strip-components 1 -xJ watchexec-${WATCHEXEC_VERSION}-$(uname -m)-unknown-linux-gnu/watchexec && \
+	chmod u+x /usr/local/bin/watchexec
+    
+WORKDIR /app
+COPY go.mod ./
+COPY go.sum ./
 RUN go mod download
-
-COPY . .
-RUN CGO_ENABLED=0 go build -o  /usr/bin/cache-service .
-
-LABEL maintainer="Michel Bongard"
-
-ENTRYPOINT [ "/usr/bin/cache-service" ]
+COPY . ./
+CMD watchexec -r -e go -- go run ./main.go

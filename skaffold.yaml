@@ -1,0 +1,34 @@
+apiVersion: skaffold/v2beta29
+kind: Config
+metadata:
+  name: cache-service
+build:
+  artifacts:
+  - image: insost/jagw-cache-service
+    docker:
+      dockerfile: Dockerfile # file for debugging / deploying
+    sync:
+      manual:
+        - src: '**/*.go'
+          dest: .
+
+deploy:
+  statusCheckDeadlineSeconds: 300 # max time to wait for deplyoment to become ready (maybe bug sometimes it takes 2 minutes)
+  kubectl:
+    defaultNamespace: jagw-dev-dominique
+    manifests:
+    - kubernetes/cache-service-cm.yaml
+    - kubernetes/cache-service-deploy.yaml
+    - kubernetes/cache-service-secret.yaml
+    - kubernetes/cache-service-svc.yaml
+
+profiles:
+  - name: hot-reload
+    activation:
+      - command: dev
+    patches:
+      - op: replace
+        path: /build/artifacts/0/docker/dockerfile # overwrite Dockerfile in gloabl skaffold config
+        value: Dockerfile.dev
+
+
