@@ -13,15 +13,17 @@ import (
 func InitializeRedisClient() {
 	sentinelMaster := os.Getenv("SENTINEL_MASTER")
 	sentinelAddress := os.Getenv("SENTINEL_ADDRESS")
+	sentinelPassword := os.Getenv("SENTINEL_PASSWORD")
 	redisPassword := os.Getenv("REDIS_PASSWORD")
 
 	logrus.WithFields(logrus.Fields{"sentinelMaster": sentinelMaster, "sentinelAddress": sentinelAddress}).Debug("Initializing Redis client.")
 
 	redisClient = redis.NewFailoverClient(&redis.FailoverOptions{
-		MasterName:    sentinelMaster,
-		SentinelAddrs: []string{sentinelAddress},
-		Password:      redisPassword,
-		DB:            0,
+		MasterName:       sentinelMaster,
+		SentinelAddrs:    []string{sentinelAddress},
+		Password:         redisPassword,
+		SentinelPassword: sentinelPassword,
+		DB:               0,
 	})
 }
 
@@ -33,7 +35,12 @@ func InitializeCache() {
 	loadLsPrefixCollection()
 	loadLsSrv6SidCollection()
 	loadLsNodeEdgeCollection()
-	loadLsNodeCoordinatesCollection()
+
+	// LsNodeCoordinates is a non-default collection and needs to be created by hand
+	loadFakeCoordinates := os.Getenv("LOAD_FAKE_COORDINATES")
+	if loadFakeCoordinates == "true" {
+		loadLsNodeCoordinatesCollection()
+	}
 }
 
 func loadLsNodeCollection() {

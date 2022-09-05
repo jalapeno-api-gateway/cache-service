@@ -5,7 +5,9 @@ metadata:
 data:
     ARANGO_ADDRESS: jalapeno-arangodb.jalapeno.svc.cluster.local:8086
     ARANGO_DB_NAME: jalapeno
-    SENTINEL_ADDRESS: sentinel.jagw-dev-dominique.svc.cluster.local:5000
+    SENTINEL_ADDRESS: jagw-redis.jagw-dev-dominique.svc.cluster.local:26379
     SENTINEL_MASTER: mymaster
     KAFKA_ADDRESS: "kafka.jalapeno.svc.cluster.local:9092"
     LOG_LEVEL: trace
+    # set to true to load non-jalapeno collection "ls_node_coordinates": -> needs to be created by hand
+    LOAD_FAKE_COORDINATES: "false"
