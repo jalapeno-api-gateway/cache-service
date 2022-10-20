@@ -13,6 +13,7 @@ build:
           dest: .
 
 deploy:
+  statusCheck: false # related to https://github.com/rancher/rancher/issues/32676
   statusCheckDeadlineSeconds: 300 # max time to wait for deplyoment to become ready (maybe bug sometimes it takes 2 minutes)
   kubectl:
     defaultNamespace: jagw-dev-dominique
