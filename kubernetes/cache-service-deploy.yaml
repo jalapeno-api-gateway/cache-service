@@ -13,7 +13,7 @@ spec:
         app: "cache-service"
     spec:
       containers:
-        - image: "insost/jagw-cache-service:dev-30"
+        - image: "insost/jagw-cache-service:dev-41"
           envFrom:
             - configMapRef:
                 name: cache-service-config
